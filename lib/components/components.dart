@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'cubit/cubit.dart';
+
 Widget defaultButton({
   double width = double.infinity,
   Color background = Colors.blue,
@@ -68,32 +70,61 @@ Widget defaultFormField({
       ),
     );
 
-Widget buildTaskItem(Map model) => Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.blue,
-            child: Text('${model['time']}'),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '${model['title']}',
-                style: TextStyle(fontSize: 22),
+Widget buildTaskItem(Map model, context) => Dismissible(
+      key: Key(model['id'].toString()),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.blue,
+              child: Text('${model['time']}'),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${model['title']}',
+                    style: TextStyle(fontSize: 22),
+                  ),
+                  Text(
+                    '${model['date']}',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
               ),
-              Text(
-                '${model['date']}',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
+            ),
+            IconButton(
+                icon: Icon(
+                  Icons.check_box,
+                  color: Colors.green,
+                ),
+                onPressed: () {
+                  AppCubit.get(context)
+                      .updateData(status: 'done', id: model['id']);
+                }),
+            SizedBox(
+              width: 10,
+            ),
+            IconButton(
+                icon: Icon(
+                  Icons.archive,
+                  color: Colors.black54,
+                ),
+                onPressed: () {
+                  AppCubit.get(context)
+                      .updateData(status: 'archive', id: model['id']);
+                })
+          ],
+        ),
       ),
+      onDismissed: (direction) {
+        AppCubit.get(context).deleteData(id: model['id']);
+      },
     );
